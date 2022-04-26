@@ -117,7 +117,11 @@ def parse_args():
     )
     ## probe name/model
     parser.add_argument(
-        "-pn", "--probe_name", type=str, default="ASSY-156-E-2", help="Probe model."
+        "-pn",
+        "--probe_name",
+        type=str,
+        default="ASSY-156-E-2",
+        help="Probe model."
     )
     ## probe wiring
     parser.add_argument(
