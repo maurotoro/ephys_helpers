@@ -37,9 +37,8 @@ from shutil import rmtree
 from utils import (get_wiring, load_recording, lazy_preproc_recording, get_structured_random_traces, get_filepath)
 from sklearn.metrics import pairwise_distances
 from spikeinterface.sortingcomponents.peak_detection import detect_peaks
-from spikeinterface.widgets import plot_timeseries
+from spikeinterface.widgets import plot_timeseries, plot_probe_map
 from probeinterface import get_probe
-from probeinterface.plotting import plot_probe
 
 plt.ion()
 
@@ -634,6 +633,7 @@ if __name__ == "__main__":
         )
         if args.remove_bad_channels_visualization:
             w = plot_random_samples(recording, pipeline=pipeline_return)
+            p = plot_probe_map(recording, with_channel_ids=True)
 
 
     # Find and remove the artifacts, save them JIC
