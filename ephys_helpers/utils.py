@@ -15,7 +15,7 @@ from os import path
 from scipy.interpolate import interp1d
 from probeinterface import get_probe
 from spikeinterface.widgets import plot_timeseries
-
+from pathlib import Path
 
 # General argparse utils
 def str2bool(v):
@@ -31,6 +31,23 @@ def str2bool(v):
         return False
     else:
         raise argparse.ArgumentTypeError("Boolean value expected.")
+
+
+# Find files by given cue
+def check_for_file(dtoken, file_cue):
+    # Check if in some folder are there files with some cue as part of their name
+    assert isinstance(file_cue, (str)), "The file_cue must be a string."
+    base_dir = Path(dtoken)
+    ret = [str(dtk) for dtk in base_dir.iterdir() if file_cue in str(dtk)]
+    if len(ret) > 1:
+        raise ValueError(
+            "The file cue given doesn't lead to a unique file, can't choose."
+            )
+    if len(ret) == 0:
+        ret = False
+    else:
+        ret = ret[0]
+    return ret
 
 
 # Utilities in general for nested dicts
@@ -77,7 +94,7 @@ def get_nested_dict_values_from_key(d, key):
     return _yield_2_list(args, _nested_dict_values_from_key)
 
 
-# EPhys and friends related functions
+# Ephys and friends related functions
 def get_filepath(recording):
     """Get the filepath from a recording.
 
@@ -433,8 +450,8 @@ def plot_artifacts(recording, thresh=100, samp_artifacts=50, tbta=[-1, 1],):
     _ = fig.suptitle('Sample of artifacts and threshold')
     return fig, ax
 
-# Interpolate waveforms
 
+# Interpolate waveforms
 def quantile_interpolate_waves(waves):
     lq_wfrm, avg_wfrm, hq_wfrm = [waves.quantile(q) for q in [0.25, 0.5, 0.75]]
     x_ori = np.linspace(0, 1, avg_wfrm.shape[0])
