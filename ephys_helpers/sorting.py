@@ -1,3 +1,7 @@
+""" Run an automatic spike sorting algorithm on some preprocessed data.
+
+"""
+
 import yaml
 import argparse
 from os import path
@@ -5,13 +9,12 @@ from pathlib import Path
 from datetime import datetime
 import spikeinterface as si
 import spikeinterface.sorters as ss
-import spikeinterface.widgets as sw
 from spikeinterface.exporters.report import export_report
 
 
 # for interactive ploting of whatever
 from spikeinterface.widgets import plot_probe_map
-from utils import plot_random_samples, plot_recording
+from utils import plot_random_samples, plot_recording, check_for_file
 import matplotlib.pyplot as plt
 plt.ion()
 
@@ -28,7 +31,6 @@ def str2bool(v):
         return False
     else:
         raise argparse.ArgumentTypeError("Boolean value expected.")
-
 
 
 def parse_args():
@@ -119,22 +121,30 @@ def get_filepath(recording):
 
 
 def set_kilosrt_2_5_params(args):
-    ks25_params = ss.Kilosort2_5Sorter.default_params()
-    ks25_params.update(dict(
+    params = ss.Kilosort2_5Sorter.default_params()
+    params.update(dict(
         car=False, minFR=0.01, minfr_goodchannels=0.1, preclust_threshold=7,
         ntbuff=16, detect_threshold=4, freq_min=300, nfilt_factor=8)
     )
-    params = ks25_params
+    # Check for params made for this file in particular:
+    ftoken_params = check_for_file(args.dtoken_base, 'kilosort2_5')
+    if ftoken_params:
+        params.update(yaml.safe_load(open(ftoken_params, "r")))
     return params
 
 
 def set_kilosrt_2_params(args):
-    ks2_params = ss.Kilosort2Sorter.default_params()
-    ks2_params.update(dict(
+    # get spikeInterface default params
+    params = ss.Kilosort2Sorter.default_params()
+    # Set our defaults
+    params.update(dict(
         car=False, minFR=0.01, minfr_goodchannels=0.1, preclust_threshold=7,
         ntbuff=16, detect_threshold=3, freq_min=300, nfilt_factor=8)
     )
-    params = ks2_params
+    # if there's a file with params, update everything to those.
+    ftoken_params = check_for_file(args.dtoken_base, 'kilosort2')
+    if ftoken_params:
+        params.update(yaml.safe_load(open(ftoken_params, "r")))
     return params
 
 
@@ -181,7 +191,6 @@ def make_sorting_report(recording, args):
     report = export_report(waves, args.dtoken_rep, **kwds_jobs)
     return waves, report
 
-    
 
 if __name__ == "__main__":
     args = parse_args()
