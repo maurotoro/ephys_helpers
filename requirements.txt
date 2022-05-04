@@ -1,0 +1,8 @@
+numpy
+scipy
+ipython == 8.0.1
+spikeinterface
+probeinterface
+ephyviewer
+matplotlib
+pandas
