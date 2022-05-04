@@ -1,0 +1,34 @@
+# This are default parameters as set in SpikeInterface taken from kilosort.
+# To change them for a particular animal, add a copy of this file to the folder
+# where the ephys file is located and update the parameters that you want.
+
+# Threshold for spike detection
+detect_threshold: 6
+# Threshold on projections
+projection_threshold: [10, 4]
+# Threshold crossings for pre-clustering (in PCA projection space)
+preclust_threshold: 8
+# Enable or disable common reference
+car: True
+# Minimum spike rate (Hz), if a cluster falls below this for too long it gets removed
+minFR: 0.1
+# Minimum firing rate on a 'good' channel
+minfr_goodchannels: 0.1
+# High-pass filter cutoff frequency
+freq_min: 150
+# Spatial constant in um for computing residual variance of spike
+sigmaMask: 30
+# Number of PCA dimensions
+nPCs: 3
+# Samples of symmetrical buffer for whitening and spike detection
+ntbuff: 64
+# Max number of clusters per good channel (even temporary ones) 4
+nfilt_factor: 4
+# Batch size (if None it is automatically computed)
+NT: None
+# If True only 'good' units are returned
+keep_good_only: False
+# Chunk size in Mb for saving to binary format (default 500Mb)
+total_memory: '500M'
+# Number of jobs for saving to binary format (Default 1
+n_jobs_bin: 
