@@ -1,1 +1,12 @@
+# all compiled
 *.pyc
+*__pycache__
+
+# ignore pickled files
+*.pkl
+
+# ignoe all possible .swp
+*.swp
+
+# All that can happen in vscode
+.vscode*
