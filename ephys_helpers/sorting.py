@@ -153,10 +153,10 @@ def get_sorter_and_params(args):
     args.dtoken_output = path.join(args.dtoken_base, f'{args.spike_sorter_algorithm}_{today}')
     args.dtoken_wfs = path.join(args.dtoken_base, 'waves')
     args.dtoken_rep = path.join(path.split(args.dtoken_output)[0], "report")
-    if args.spike_sorter_algorithm == "ks2":
+    if args.spike_sorter_algorithm == "ks25":
         args.params = set_kilosrt_2_5_params(args)
         args.sorter = ss.run_kilosort2_5
-    if args.spike_sorter_algorithm == "ks2":
+    elif args.spike_sorter_algorithm == "ks2":
         args.params = set_kilosrt_2_params(args)
         args.sorter = ss.run_kilosort2
     return args
