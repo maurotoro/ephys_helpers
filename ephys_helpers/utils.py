@@ -463,3 +463,15 @@ def quantile_interpolate_waves(waves):
     nlq_wfrm, navg_wfrm, nhq_wfrm = [f(x_new) for f in [f_lq, f_av, f_hq]]
     ret = pd.DataFrame(data=[nlq_wfrm, navg_wfrm, nhq_wfrm], index=[0.25, 0.5, 0.75]).rename_axis(index='percentile')
     return ret
+
+
+
+# make single wire electrodes with probeinterface
+
+def make_single_wired(
+    n_chanels, n_canulas, xpitch=300, ypitch=300,
+    contact_shapes='square', contact_shape_params={'width': 12}
+):
+    from probeinterface import generate_multi_shank
+    probe = generate_multi_shank()
+    pass
