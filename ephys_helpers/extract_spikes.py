@@ -14,6 +14,7 @@ for now it works, but requires human renaming of the resulting pickle file.
 
 from os import path
 import argparse
+import pickle
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -159,30 +160,49 @@ def make_SI_report(dtoken_si, dtoken_phy):
     pass
 
 
+def sanitize_spikes(ftoken_spikes, remove_dup=True, verbose=False):
+    # A simple procedure to remove posible noisy detected spikes
+    # KS and oneself can lead to duplicated spikes, for sanity and neurosis
+    # remove all duplicated events in any session.
+    ephy_data = pickle.load(open(ftoken_spikes, 'rb'))
+    # get all valid indices
+    ixs = ephy_data.loc[:, "sample"].drop_duplicates(keep=False).index
+    # make a new name for the file:
+    ftoken_nname = path.splitext(ftoken_spikes)[0] + "_clnup.pkl"
+    if remove_dup:
+        ephy_data.loc[ephy_data.index.isin(ixs), :].to_pickle(ftoken_nname)
+    if verbose:
+        print(f'From {path.split(ftoken_spikes)[1]}: removed {ephy_data.shape[0] - ixs.shape[0]} spikes')
+
+
 def parse_args():
     description = \
     """Get the spikes from a sorting result.
 
     After running some spike sorting algorithm, this allows to extract the
-    individual spikes with their asigned cluster, channel ID and waveform.
+    individual spikes with their assigned cluster, channel ID and waveform.
 
     This are saved as a pickle ndarray, where each row is one spike, and 5 columns
     ["id", "channel", "label", "sample", "wave"], the last column has wave_len size.
     """
     parser = argparse.ArgumentParser(description=description)
     parser.add_argument("ftoken_bin", type=str,
-                        help="SpikeInterface recording directory.")
+        help="SpikeInterface recording directory.")
     parser.add_argument("dtoken", type=str,
-                        help="Location of the phy results folder.")
+        help="Location of the phy results folder.")
     parser.add_argument("--extractor", type=str, default="phy",
-                        choices={'phy', 'pols'},
-                        help="Data type of the recording as a string.")
+        choices={'phy', 'pols'},
+        help="Data type of the recording as a string.")
     parser.add_argument("--dtype", type=str, default="np.int16",
-                        help="Data type of the recording as a string.")
+        help="Data type of the recording as a string.")
     parser.add_argument("-nc", "--n_channels", type=int, default=32,
-                        help="Number of channels in the recordings.")
+        help="Number of channels in the recordings.")
     parser.add_argument("-wl", "--wave_len", type=int, default=30,
-                        help="How many samples around the event to save.")
+        help="How many samples around the event to save.")
+    parser.add_argument("-mr", "--make_report", action="store_true", default=False,
+        help="Whether to save a report to asses sorting quality.")
+    parser.add_argument("-ss", "--sanitize_spikes", action="store_true", default=False,
+        help="Whether to remove spikes that where detected more than once.")
     return parser.parse_args()
 
 
@@ -202,11 +222,16 @@ if __name__ == '__main__':
         # Make the spikeinterface report for the sorting results
         dtoken_si = path.split(args.ftoken_bin)[0]
         dtoken_phy = args.dtoken
-        make_SI_report(dtoken_si, dtoken_phy)
+        if args.make_report:
+            make_SI_report(dtoken_si, dtoken_phy)
     elif args.extractor == "pols":
         neurons = POLS_extractor(args.ftoken_bin, sample_rate=30000)
     new_f = path.splitext(args.ftoken_bin)[0] + ".pkl"
     print("Saving the results.")
     neurons.to_pickle(new_f)
     print("Results saved.")
+    if args.sanitize_spikes:
+        print("Cleaning up duplicated spikes.")
+        sanitize_spikes(new_f, remove_dup=True, verbose=True)
+        print("Done cleaning up duplicated spikes.")
     exit()

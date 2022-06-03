@@ -56,7 +56,7 @@ python ephys_helpers/preprocess.py session_recording.bin \
 ```
 
 On that visualization one can get a sensse of which channels to censor from the
-preprocessing and later steps. The channels could look like too noisy, too narrow 
+preprocessing and later steps. The channels could look like too noisy, too narrow
 bandwith, or weird unique peaks. The origin of this issues is highly bizzarre,
 some can be corrected during recorgind, by rechecking the grounding on the implant
 or setup, but some are related to having electrodes on non-recording friendly places,
@@ -74,7 +74,7 @@ python ephys_helpers/preprocess.py session_recording.bin \
     # Remove bad channels switch
     --remove_bad_channels
     # Now add each noisy channel
-    --remove_bad_channels_id 9 
+    --remove_bad_channels_id 9
     --remove_bad_channels_id 37
     --remove_bad_channels_id 41
     # Channels that are this different (MAD times) from the rest will be removed
@@ -93,7 +93,7 @@ the rest.
 
 #### Detect artifacts
 
-Now, asumming a freely moving session, there will be movement, chewing or other 
+Now, asumming a freely moving session, there will be movement, chewing or other
 associated artifacts, they will induce really **HIGH amplitude** noise on the signal,
 this will hurt the spike detection as some 'really goo amazing units' are sparsely
 present and whatever, they do hurt a lot. Set to zero everything a bit before and
@@ -136,9 +136,24 @@ python ephys_helpers/preprocess.py session_recording.bin \
     --freq_min 200
     # High cut for the bandpass
     --freq_max 9000
-    # The type of common average referencing to be used 
+    # The type of common average referencing to be used
     # one of {global, local group}, by default is global
     --car global
     # Save file switch
     --save
 ```
+
+#### Run sorting algorithm
+
+Describe how to run the sorting script.
+
+
+
+#### Extract spikes
+
+Describe how to run the spike extraction script.
+
+
+# Comments
+
+When running kilosort-X there might be issues, the main one found up to now is that they are hiding that one can change the length of the waveforms extracted, and this parameter has been empirically shown to be relevant for our recordings. The current way to have access to it is by changing the `ops.nt0` by hand after the creation of the pipeline by spikeInterface, this is subpar but hasn't been added on their end, I'll make a pull request to add it as it could be useful.
